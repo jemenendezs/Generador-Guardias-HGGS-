@@ -4,20 +4,23 @@ Una herramienta Python para generar calendarios de guardias médicas en formato 
 
 ## 🚀 Características
 
-- **Procesamiento intuitivo**: Introduce tus guardias en formato simple (`N12 L L M8 M12`)
+- **Procesamiento intuitivo**: Copia y pega directamente desde Excel tu fila completa de guardias
 - **Múltiples formatos**: Genera archivos TXT (legible) e ICS (para calendarios)
 - **Compatibilidad multiplataforma**: Funciona en Windows, Linux y Android (Termux)
-- **Interfaz amigable**: Guía paso a paso con mensajes claros
-- **Estadísticas automáticas**: Resumen de días de guardia y libres
-- **Código optimizado**: Legible, mantenible y bien documentado
+- **Interfaz amigable**: Guía paso a paso con mensajes claros e instrucciones detalladas
+- **Estadísticas automáticas**: Resumen de días de guardia y libres por tipo de turno
+- **Código optimizado**: Legible, mantenible y bien estructurado
 
 ## 📋 Formatos de Guardia Soportados
 
 | Código | Descripción | Horario |
 |--------|-------------|---------|
-| `N12` | Guardia PM 12 horas | 19:30 - 08:00 (día siguiente) |
-| `M12` | Guardia AM 12 horas | 07:30 - 20:00 |
 | `M8` | Guardia AM 8 horas | 07:30 - 15:30 |
+| `N8` | Guardia PM 8 horas | 15:30 - 23:30 |
+| `M12` | Guardia AM 12 horas | 07:30 - 20:00 |
+| `N12` | Guardia PM 12 horas | 19:30 - 08:00 (día siguiente) |
+| `M16` | Guardia AM 16 horas | 07:30 - 23:30 |
+| `N16` | Guardia PM 16 horas | 15:30 - 07:30 (día siguiente) |
 | `L` | Día Libre | - |
 
 ## 🛠️ Instalación
@@ -29,57 +32,73 @@ Una herramienta Python para generar calendarios de guardias médicas en formato 
 ### Ejecución directa
 ```
 python generador_guardias.py
-
 ```
 
-## 📖 Uso
+# 📖 Uso
 
 1. **Ejecuta el script**
 2. **Selecciona el mes** (1-12)
-3. **Pega tu cadena de guardias** en el formato:
-```
-
-N12 L L M8 M12 N12 L L L M12 N12 L L L M12
-
-```
+3. **Sigue las instrucciones** para copiar desde Excel:
+   - Abre el archivo Excel de guardias
+   - Busca tu fila correspondiente
+   - Selecciona toda la fila desde el día 1 hasta el final del mes
+   - Copia y pega la secuencia completa
 4. **Archivos generados automáticamente** en la carpeta de Descargas
 
 ### 📝 Ejemplo de Entrada Completa
-```
 
-N12 L L M8 M12 N12 L L L M12 N12 L L L M12 L L M8 N12 L L M12 M8 L L N12
+```
+M16 L L N8 M12 N16 L L L M12 N8 L L L M16
 
 ```
 
 ### 📤 Archivos Generados
-- `listado_guardias_enero_2024.txt` - Listado legible con estadísticas
+- `listado_guardias_enero_2024.txt` - Listado legible con estadísticas detalladas
 - `guardias_enero_2024.ics` - Para importar en Google Calendar, Outlook, Apple Calendar, etc.
 
 ### 🎮 Interfaz de Usuario
 El programa guía al usuario paso a paso:
+
 ```
 
 📅 GENERADOR DE GUARDIAS HGGS
 ==================================================
-👉Ingresa el número del mes (1-12): 3
+👉 Ingresa el número del mes (1-12): 3
 
 📋 Mes seleccionado: MARZO 2024
 
 ==================================================
-FORMATO:Cadena con N12, M12, M8, L separados por espacios/tabs
-EJEMPLO:N12 L L M8 M12 N12 L L L M12
+📋 INSTRUCCIONES PARA COPIAR DESDE EXCEL
 ==================================================
-Pega la cadena completa de guardias:
+Para el mes de MARZO 2024 (31 días):
 
+1. 📊 Abre el archivo Excel de guardias
+2. 👤 Busca la fila correspondiente a tu usuario/nombre
+3. 📝 En esa fila, localiza la secuencia de guardias que comienza desde el día 1
+4. 🖱️  Selecciona TODA la fila desde la columna del día 1 hasta el final del mes
+5. 📋 Copia (Ctrl+C) toda esa secuencia
+
+🔍 FORMATO ESPERADO (ejemplo con 7 días):
+   M16   L    L   N8   M12   N16   L
+   (puede contener espacios o tabulaciones entre los códigos)
+
+📌 CÓDIGOS DISPONIBLES:
+   M8  = Guardia AM 8h (07:30-15:30)
+   N8  = Guardia PM 8h (15:30-23:30)
+   M12 = Guardia AM 12h (07:30-20:00)
+   N12 = Guardia PM 12h (19:30-08:00)
+   M16 = Guardia AM 16h (07:30-23:30)
+   N16 = Guardia PM 16h (15:30-07:30)
+   L   = Día Libre
+
+👉 Ahora PEGA la cadena copiada desde Excel y presiona ENTER:
+--------------------------------------------------
 ```
 
 ## 🗂️ Estructura del Proyecto
-
 ```
-
 generador_guardias.py    # Script principal
-README.md# Esta documentación
-
+README.md                # Esta documentación
 ```
 
 ## 💻 Tecnologías Utilizadas
@@ -101,9 +120,10 @@ pkg install python
 
 # Ejecutar el script
 python generador_guardias.py
+
 ```
 
-Los archivos se guardan automáticamente en /storage/emulated/0/Download/
+Los archivos se guardan automáticamente en `/storage/emulated/0/Download/`
 
 ## 🔧 Características Técnicas
 
@@ -114,6 +134,7 @@ Los archivos se guardan automáticamente en /storage/emulated/0/Download/
 * ✅ Estadísticas automáticas - Conteo por tipo de guardia y días libres
 * ✅ Código modular y mantenible - Arquitectura orientada a objetos
 * ✅ Compatibilidad multiplataforma - Windows, Linux, macOS, Android
+* ✅ Procesamiento flexible - Acepta espacios y tabulaciones en la entrada
 
 ## 🎯 Ejemplo de Salida
 
@@ -123,52 +144,60 @@ Archivo TXT generado:
 GUARDIAS MARZO 2024 HGGS
 ==========================
 
-* 01/03/2024 - Guardia PM 12 horas
-* 04/03/2024 - Guardia AM 8 horas
+* 01/03/2024 - Guardia AM 16 horas
+* 04/03/2024 - Guardia PM 8 horas
 * 05/03/2024 - Guardia AM 12 horas
+* 06/03/2024 - Guardia PM 16 horas
 
 --- RESUMEN ---
-Total de días del mes: 30
+Total de días del mes: 31
 Días de guardia: 15
-Días libres: 15
-Guardia PM 12 horas: 5
-Guardia AM 12 horas: 7
+Días libres: 16
 Guardia AM 8 horas: 3
+Guardia PM 8 horas: 2
+Guardia AM 12 horas: 4
+Guardia PM 12 horas: 2
+Guardia AM 16 horas: 3
+Guardia PM 16 horas: 1
 ```
 
-**Archivo ICS:**
-
-Archivo compatible con todas las aplicaciones de calendario modernas, listo para importar.
+Archivo ICS: Archivo compatible con todas las aplicaciones de calendario modernas, listo para importar.
 
 ## 📄 Estructura del Código
 
 El proyecto sigue una arquitectura modular:
 
-```python
+```
 class GeneradorGuardias:
-    ├── _procesar_entrada_mes()      # Validación de entrada del mes
-    ├── _procesar_cadena_guardias()  # Procesamiento de la cadena de guardias
-    ├── _generar_txt()              # Generación de archivo de texto
-    ├── _generar_ics()              # Generación de archivo de calendario
-    └── ejecutar()                  # Método principal que orquesta el flujo
+    ├── procesar_entrada_mes()      # Validación de entrada del mes
+    ├── mostrar_instrucciones()     # Instrucciones detalladas para el usuario
+    ├── procesar_cadena_guardias()  # Procesamiento de la cadena de guardias
+    ├── generar_txt()               # Generación de archivo de texto
+    ├── generar_ics()               # Generación de archivo de calendario
+    └── ejecutar()
 ```
 
 ## 🐛 Solución de Problemas
 
-*Error: "No se encontraron guardias válidas"*
+**Error: "No se encontraron guardias válidas"**
 
-* Verifica que estés usando los códigos correctos (N12, M12, M8, L)
-* Asegúrate de separar los elementos con espacios o tabs
+* Verifica que estés usando los códigos correctos (M8, N8, M12, N12, M16, N16, L)
+* Asegúrate de copiar toda la fila desde el día 1 en Excel
 
-*Error: "Entrada inválida"*
+**Error: "Entrada inválida"**
 
 * Solo se aceptan números del 1 al 12 para el mes
 * La cadena de guardias no debe contener caracteres especiales
 
-*Los archivos no aparecen en Descargas*
+**Los archivos no aparecen en Descargas**
 
 * Verifica los permisos de escritura en la carpeta de descargas
-* En Android, asegúrate de que Termux tenga permisos de almacenamiento.
+* En Android, asegúrate de que Termux tenga permisos de almacenamiento
+
+**Problemas con el formato de entrada**
+
+* Asegúrate de copiar directamente desde Excel, no modificar manualmente
+* El programa acepta tanto espacios como tabulaciones entre los códigos
 
 ## 📄 Licencia
 
@@ -177,3 +206,7 @@ Este proyecto es de uso libre para la comunidad médica. Distribuido bajo licenc
 ## 👨‍💻 Autor
 
 Desarrollado por el Dr. Jorge Menéndez para facilitar la gestión de guardias médicas en el HGGS.
+
+---
+
+**Versión 2.0** - Actualizado con nuevos tipos de guardia y mejoras en la interfaz de usuario.
