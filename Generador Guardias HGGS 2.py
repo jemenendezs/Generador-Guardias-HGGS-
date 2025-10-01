@@ -14,12 +14,18 @@ CONFIG = {
         "N12": ("19:30", "08:00"),  # Guardia PM 12h (termina al día siguiente)
         "M12": ("07:30", "20:00"),  # Guardia AM 12h
         "M8": ("07:30", "15:30"),   # Guardia AM 8h
+        "M16": ("07:30", "23:30"),  # Guardia AM 16h
+        "N16": ("15:30", "07:30"),  # Guardia PM 16h (termina al día siguiente)
+        "N8": ("15:30", "23:30"),   # Guardia PM 8h
         "L": None  # Libre
     },
     "descripciones": {
         "N12": "Guardia PM 12 horas",
         "M12": "Guardia AM 12 horas", 
         "M8": "Guardia AM 8 horas",
+        "M16": "Guardia AM 16 horas",
+        "N16": "Guardia PM 16 horas",
+        "N8": "Guardia PM 8 horas",
         "L": "Día Libre"
     },
     "meses": {
@@ -34,13 +40,11 @@ class GeneradorGuardias:
         self.ruta_descargas = self._obtener_ruta_descargas()
     
     def _obtener_ruta_descargas(self):
-        """Obtiene la ruta de descargas compatible con diferentes sistemas"""
         if os.name == 'posix' and 'ANDROID_STORAGE' in os.environ:
             return "/storage/emulated/0/Download/"
         return os.path.join(os.path.expanduser("~"), "Downloads")
     
     def _procesar_entrada_mes(self):
-        """Solicita y valida la entrada del mes"""
         while True:
             try:
                 mes_num = int(input("👉 Ingresa el número del mes (1-12): "))
@@ -50,19 +54,35 @@ class GeneradorGuardias:
             except ValueError:
                 print("⚠ Entrada inválida. Ingresa un número del 1 al 12.")
     
-    def _mostrar_instrucciones(self):
-        """Muestra las instrucciones de formato"""
-        print("\n" + "=" * 50)
-        print("FORMATO: Cadena con N12, M12, M8, L separados por espacios/tabs")
-        print("EJEMPLO: N12 L L M8 M12 N12 L L L M12 N12 L L L M12")
-        print("=" * 50)
-        print("Pega la cadena completa de guardias:")
+    def _mostrar_instrucciones(self, mes_nombre, anio, total_dias_estimado=31):
+        print("\n" + "=" * 60)
+        print("📋 INSTRUCCIONES PARA COPIAR DESDE EXCEL")
+        print("=" * 60)
+        print(f"Para el mes de {mes_nombre.upper()} {anio} ({total_dias_estimado} días):")
+        print("")
+        print("1. 📊 Abre el archivo Excel de guardias")
+        print("2. 👤 Busca la fila correspondiente a tu usuario/nombre")
+        print("3. 📝 En esa fila, localiza la secuencia de guardias que comienza desde el día 1")
+        print("4. 🖱️  Selecciona TODA la fila desde la columna del día 1 hasta el final del mes")
+        print("5. 📋 Copia (Ctrl+C) toda esa secuencia")
+        print("")
+        print("🔍 FORMATO ESPERADO (ejemplo con 7 días):")
+        print("   M16   L    L   N8   M12   N16   L")
+        print("   (puede contener espacios o tabulaciones entre los códigos)")
+        print("")
+        print("📌 CÓDIGOS DISPONIBLES:")
+        print("   M8  = Guardia AM 8h (07:30-15:30)")
+        print("   N8  = Guardia PM 8h (15:30-23:30)")
+        print("   M12 = Guardia AM 12h (07:30-20:00)")
+        print("   N12 = Guardia PM 12h (19:30-08:00)")
+        print("   M16 = Guardia AM 16h (07:30-23:30)")
+        print("   N16 = Guardia PM 16h (15:30-07:30)")
+        print("   L   = Día Libre")
+        print("")
+        print("👉 Ahora PEGA la cadena copiada desde Excel y presiona ENTER:")
+        print("-" * 60)
     
     def _procesar_cadena_guardias(self, cadena):
-        """
-        Procesa la cadena de texto con formato: N12 L L M8 M12 N12...
-        Retorna lista de guardias y estadísticas
-        """
         elementos = cadena.replace('\t', ' ').split()
         guardias = []
         dia_actual = 1
@@ -71,7 +91,7 @@ class GeneradorGuardias:
             tipo = elemento.strip().upper()
             
             if tipo in CONFIG["horarios"]:
-                if tipo != "L":  # Solo agregar si no es libre
+                if tipo != "L":
                     guardias.append((dia_actual, tipo))
                 dia_actual += 1
             else:
@@ -80,14 +100,12 @@ class GeneradorGuardias:
         return guardias
     
     def _mostrar_calendario(self, guardias, mes_nombre, mes_num, anio):
-        """Muestra el calendario de guardias procesado"""
         print(f"\n📅 Calendario de guardias para {mes_nombre.upper()} {anio}:")
         for dia, tipo in guardias:
             fecha = f"{dia:02d}/{mes_num:02d}/{anio}"
             print(f"   - {fecha}: {CONFIG['descripciones'][tipo]}")
     
     def _mostrar_estadisticas(self, guardias, total_dias):
-        """Muestra estadísticas del procesamiento"""
         dias_guardia = len(guardias)
         dias_libres = total_dias - dias_guardia
         
@@ -96,23 +114,19 @@ class GeneradorGuardias:
         print(f"   - Días de guardia: {dias_guardia}")
         print(f"   - Días libres: {dias_libres}")
         
-        # Conteo por tipo de guardia
-        for tipo in ["N12", "M12", "M8"]:
+        for tipo in ["M8", "N8", "M12", "N12", "M16", "N16"]:
             count = sum(1 for _, t in guardias if t == tipo)
             if count > 0:
                 print(f"   - {CONFIG['descripciones'][tipo]}: {count}")
     
     def _generar_txt(self, guardias, mes_nombre, mes_num, anio, total_dias):
-        """Genera archivo TXT con el listado de guardias"""
         titulo = f"GUARDIAS {mes_nombre.upper()} {anio} HGGS"
         contenido = [titulo, "=" * len(titulo), ""]
         
-        # Lista de guardias
         for dia, tipo in guardias:
             fecha = f"{dia:02d}/{mes_num:02d}/{anio}"
             contenido.append(f"* {fecha} - {CONFIG['descripciones'][tipo]}")
         
-        # Estadísticas
         contenido.extend([
             "", "--- RESUMEN ---",
             f"Total de días del mes: {total_dias}",
@@ -120,12 +134,11 @@ class GeneradorGuardias:
             f"Días libres: {total_dias - len(guardias)}"
         ])
         
-        for tipo in ["N12", "M12", "M8"]:
+        for tipo in ["M8", "N8", "M12", "N12", "M16", "N16"]:
             count = sum(1 for _, t in guardias if t == tipo)
             if count > 0:
                 contenido.append(f"{CONFIG['descripciones'][tipo]}: {count}")
         
-        # Guardar archivo
         nombre_archivo = f"listado_guardias_{mes_nombre}_{anio}.txt"
         ruta_completa = os.path.join(self.ruta_descargas, nombre_archivo)
         
@@ -135,7 +148,6 @@ class GeneradorGuardias:
         return ruta_completa
     
     def _generar_ics(self, guardias, mes_nombre, mes_num, anio):
-        """Genera archivo ICS para calendario"""
         uid_base = str(uuid.uuid4())
         lineas = [
             "BEGIN:VCALENDAR",
@@ -151,8 +163,7 @@ class GeneradorGuardias:
                                int(inicio.split(':')[0]), 
                                int(inicio.split(':')[1]))
             
-            # Manejar guardias que terminan al día siguiente
-            if tipo == "N12":
+            if tipo in ["N12", "N16"]:
                 fin_dt = datetime(anio, mes_num, dia,
                                 int(fin.split(':')[0]), 
                                 int(fin.split(':')[1])) + timedelta(days=1)
@@ -178,7 +189,6 @@ class GeneradorGuardias:
         
         lineas.append("END:VCALENDAR")
         
-        # Guardar archivo
         nombre_archivo = f"guardias_{mes_nombre}_{anio}.ics"
         ruta_completa = os.path.join(self.ruta_descargas, nombre_archivo)
         
@@ -188,45 +198,38 @@ class GeneradorGuardias:
         return ruta_completa
     
     def ejecutar(self):
-        """Función principal que orquesta todo el proceso"""
         print("📅 GENERADOR DE GUARDIAS HGGS")
         print("=" * 50)
         
-        # Configuración inicial
         mes_num = self._procesar_entrada_mes()
         anio = datetime.now().year
         mes_nombre = CONFIG["meses"][mes_num]
         
         print(f"\n📋 Mes seleccionado: {mes_nombre.upper()} {anio}")
         
-        # Entrada de datos
-        self._mostrar_instrucciones()
+        self._mostrar_instrucciones(mes_nombre, anio)
         cadena = input().strip()
         
         if not cadena:
             print("❌ No se ingresó ninguna cadena. Saliendo...")
             return
         
-        # Procesamiento
         guardias = self._procesar_cadena_guardias(cadena)
-        total_dias = len(cadena.split())  # Total de elementos procesados
+        total_dias = len(cadena.split())
         
         if not guardias:
             print("❌ No se encontraron guardias válidas. Saliendo...")
             return
         
-        # Resultados
         self._mostrar_calendario(guardias, mes_nombre, mes_num, anio)
         self._mostrar_estadisticas(guardias, total_dias)
         
-        # Generación de archivos
         self._generar_txt(guardias, mes_nombre, mes_num, anio, total_dias)
         self._generar_ics(guardias, mes_nombre, mes_num, anio)
         
         print(f"\n💾 Archivos guardados en: {self.ruta_descargas}")
 
 def main():
-    """Punto de entrada principal"""
     generador = GeneradorGuardias()
     generador.ejecutar()
 
