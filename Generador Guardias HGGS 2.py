@@ -17,7 +17,9 @@ CONFIG = {
         "M16": ("07:30", "23:30"),  # Guardia AM 16h
         "N16": ("15:30", "07:30"),  # Guardia PM 16h (termina al día siguiente)
         "N8": ("15:30", "23:30"),   # Guardia PM 8h
-        "L": None  # Libre
+        "T8H": ("11:30", "19:30"),  # Guardia tarde 8h intermedio
+        "L": None,  # Libre
+        "F": None,  # Feriado (Libre)
     },
     "descripciones": {
         "N12": "Guardia PM 12 horas",
@@ -26,7 +28,9 @@ CONFIG = {
         "M16": "Guardia AM 16 horas",
         "N16": "Guardia PM 16 horas",
         "N8": "Guardia PM 8 horas",
-        "L": "Día Libre"
+        "T8H": "Guardia tarde 8h intermedio",
+        "L": "Día Libre",
+        "F": "Feriado",
     },
     "meses": {
         1: "enero", 2: "febrero", 3: "marzo", 4: "abril", 
@@ -77,7 +81,9 @@ class GeneradorGuardias:
         print("   N12 = Guardia PM 12h (19:30-08:00)")
         print("   M16 = Guardia AM 16h (07:30-23:30)")
         print("   N16 = Guardia PM 16h (15:30-07:30)")
+        print("   T8  = Guardia tarde 8h (11:30-19:30)")
         print("   L   = Día Libre")
+        print("   F   = Feriado")
         print("")
         print("👉 Ahora PEGA la cadena copiada desde Excel y presiona ENTER:")
         print("-" * 60)
@@ -91,7 +97,7 @@ class GeneradorGuardias:
             tipo = elemento.strip().upper()
             
             if tipo in CONFIG["horarios"]:
-                if tipo != "L":
+                if tipo not in ["L", "F"]:
                     guardias.append((dia_actual, tipo))
                 dia_actual += 1
             else:
@@ -114,7 +120,7 @@ class GeneradorGuardias:
         print(f"   - Días de guardia: {dias_guardia}")
         print(f"   - Días libres: {dias_libres}")
         
-        for tipo in ["M8", "N8", "M12", "N12", "M16", "N16"]:
+        for tipo in ["M8", "N8", "M12", "N12", "M16", "N16", "T8H"]:
             count = sum(1 for _, t in guardias if t == tipo)
             if count > 0:
                 print(f"   - {CONFIG['descripciones'][tipo]}: {count}")
@@ -134,7 +140,7 @@ class GeneradorGuardias:
             f"Días libres: {total_dias - len(guardias)}"
         ])
         
-        for tipo in ["M8", "N8", "M12", "N12", "M16", "N16"]:
+        for tipo in ["M8", "N8", "M12", "N12", "M16", "N16", "T8H"]:
             count = sum(1 for _, t in guardias if t == tipo)
             if count > 0:
                 contenido.append(f"{CONFIG['descripciones'][tipo]}: {count}")
